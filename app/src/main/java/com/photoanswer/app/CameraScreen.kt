@@ -27,6 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.unit.IntOffset
@@ -245,6 +247,9 @@ internal fun CameraScreen(tasks: List<SolveTask> = emptyList(), activeCount: Int
     }
 
     BoxWithConstraints(Modifier.fillMaxSize().background(Color.Black)) {
+        val density = LocalDensity.current
+        var headerHeight by remember { mutableIntStateOf(0) }
+        var footerHeight by remember { mutableIntStateOf(0) }
         val compact = maxHeight < 480.dp || maxWidth < 340.dp
         val veryShort = maxHeight < 340.dp
         if (hasPermission) {
@@ -284,6 +289,7 @@ internal fun CameraScreen(tasks: List<SolveTask> = emptyList(), activeCount: Int
             }
         }
         Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()
+            .onSizeChanged { headerHeight = it.height }
             .background(Color.Black.copy(alpha = .72f)).statusBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -318,15 +324,23 @@ internal fun CameraScreen(tasks: List<SolveTask> = emptyList(), activeCount: Int
             }
         }
         if (!hasPermission || cameraError) {
-            Column(Modifier.align(Alignment.Center).padding(horizontal = 24.dp).padding(top = if (compact) 88.dp else 160.dp, bottom = if (compact) 104.dp else 184.dp)
-                .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally,
+            Column(Modifier.fillMaxSize().padding(
+                top = with(density) { headerHeight.toDp() },
+                bottom = with(density) { footerHeight.toDp() }
+            ).padding(horizontal = 24.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 if (!compact) {
-                Icon(Icons.Default.CameraAlt, null, Modifier.size(48.dp), tint = Color.White)
-                Text(if (cameraError) "相机暂时无法使用" else "允许相机访问，开始拍摄", color = Color.White, style = MaterialTheme.typography.titleLarge)
-                Text(if (cameraError) "可以重新连接相机，已拍摄的照片仍在相册中。" else "照片仅用于你发起的处理请求，你可以随时删除记录。",
-                    color = Color.White, style = MaterialTheme.typography.bodyMedium)
-                }
+                    Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        Icon(Icons.Default.CameraAlt, null, Modifier.size(48.dp), tint = Color.White)
+                        Text(if (cameraError) "相机暂时无法使用" else "允许相机访问，开始拍摄",
+                            Modifier.padding(top = 16.dp), color = Color.White,
+                            style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
+                        Text(if (cameraError) "可以重新连接相机，已拍摄的照片仍在相册中。" else "照片仅用于你发起的处理请求，你可以随时删除记录。",
+                            Modifier.padding(top = 12.dp), color = Color.White,
+                            style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                    }
+                } else Spacer(Modifier.weight(1f))
                 Button(onClick = {
                     if (cameraError) { cameraReady = false; cameraError = false; controllerVersion++ }
                     else {
@@ -336,9 +350,10 @@ internal fun CameraScreen(tasks: List<SolveTask> = emptyList(), activeCount: Int
                         else cameraPermission.launch(Manifest.permission.CAMERA)
                     }
                 }, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (cameraError) "重新连接" else if (settingsNeeded) "前往系统设置" else if (compact) "开启相机" else "允许访问相机") }
+                if (compact) Spacer(Modifier.weight(1f))
             }
         }
-        Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+        Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().onSizeChanged { footerHeight = it.height }) {
             SnackbarHost(snackbar, Modifier.padding(horizontal = 16.dp))
             Surface(color = Color(0xFF121815).copy(alpha = .94f), contentColor = Color.White) {
                 Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = if (compact) 8.dp else 16.dp),

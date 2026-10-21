@@ -21,6 +21,13 @@
 -keep class com.photoanswer.app.SecurePrefs { *; }
 -keep class com.photoanswer.app.SolveTask { *; }
 -keep class com.photoanswer.app.MathMarkdown { *; }
+# The constrained-size accessibility test mounts these composables from the test APK.
+-keep class com.photoanswer.app.CameraScreenKt {
+    public static *** CameraScreen(...);
+}
+-keep class com.photoanswer.app.AppThemeKt {
+    public static *** CameraTheme(...);
+}
 # FormulaReleaseTest calls the renderer and inspects its drawables from the test DEX.
 -keep class io.noties.markwon.Markwon** { *; }
 -keep class io.noties.markwon.image.AsyncDrawable** { *; }

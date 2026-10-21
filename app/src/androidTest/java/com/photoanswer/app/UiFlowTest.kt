@@ -3,6 +3,14 @@ package com.photoanswer.app
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -36,6 +44,23 @@ class UiFlowTest {
         screenshot("settings-discard")
         ui.onNodeWithText("继续编辑").performClick()
         ui.onNodeWithText("fixture-vision").assertExists()
+    }
+
+    @Test fun smallScreenLargeFontKeepsCameraPermissionActionFullyVisible() {
+        ui.runOnUiThread {
+            ui.activity.setContent {
+                val density = LocalDensity.current.density
+                CameraTheme {
+                    CompositionLocalProvider(LocalDensity provides Density(density, 1.6f)) {
+                        Box(Modifier.size(345.dp, 610.dp)) {
+                            CameraScreen(onAlbum = {}, onSettings = {})
+                        }
+                    }
+                }
+            }
+        }
+        ui.onNodeWithText("允许访问相机").assertIsDisplayed().assertHeightIsAtLeast(48.dp)
+        screenshot("camera-large-font")
     }
 
     @Test fun savedConnectionReturnsExpandedAfterRecreation() {
