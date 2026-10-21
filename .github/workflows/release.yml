@@ -113,7 +113,9 @@ jobs:
           (cd "$RUNNER_TEMP/release-verification" && sha256sum --check SHA256SUMS)
       - name: Publish complete release
         run: |
-          RELEASE_ID="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" --jq .id)"
+          # The REST lookup by tag excludes drafts. gh resolves drafts through
+          # GraphQL and exposes the database ID required by the publish API.
+          RELEASE_ID="$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json databaseId --jq .databaseId)"
           if [[ "$RELEASE_TAG" == *-rc.* ]]; then
             PRERELEASE=true
           else
@@ -122,7 +124,7 @@ jobs:
           BODY="$(jq -n --argjson prerelease "$PRERELEASE" \
             '{draft:false, prerelease:$prerelease, make_latest:(if $prerelease then "false" else "true" end)}')"
           echo "$BODY" | gh api --method PATCH \
-            "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" --input -
+            "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" --input - --silent
       - name: Retain release diagnostics
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

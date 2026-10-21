@@ -82,7 +82,7 @@ jobs:
           git push "$REMOTE" "HEAD:$BRANCH"
           if [[ -z "$PR_NUMBER" ]]; then
             gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$BRANCH" \
-              --title "Release v$TARGET" --body "Updates version.properties and RELEASE_NOTES.md. Merge this pull request, then create and push tag v$TARGET after CI passes."
+              --title "Release v$TARGET" --body "Updates version.properties and RELEASE_NOTES.md. After Release CI passes, merge this pull request and run Publish current version on main to verify and publish v$TARGET."
           else
             echo "Updated the existing release pull request #$PR_NUMBER."
           fi

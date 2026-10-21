@@ -91,7 +91,7 @@ The `publish-release.yml` entry point does not bypass verification. The tag work
 - `SHA256SUMS`
 - `signing-certificate.txt` (public certificate diagnostics)
 
-Assets are uploaded to a draft, downloaded and checked before the release is published. Candidate tags become pre-releases and are never marked latest. Stable tags are marked latest only after the complete asset set is present. A failed draft may be retried; a published release may not be overwritten. Release jobs are serialized and are not canceled by a later push. A manual retry must select the same tag as both the workflow ref and `tag` input.
+Assets are uploaded to a draft, downloaded and checked before the release is published. The publisher resolves the draft's database ID with `gh release view`; the REST lookup by tag only resolves published releases. Candidate tags become pre-releases and are never marked latest. Stable tags are marked latest only after the complete asset set is present. A failed draft may be retried; a published release may not be overwritten. Release jobs are serialized and are not canceled by a later push. A manual retry must select the same tag as both the workflow ref and `tag` input.
 
 ## Application update behavior
 
