@@ -1,16 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M54,29 A25,25 0,1,0 54,79 A25,25 0,1,0 54,29 Z M54,36 A18,18 0,1,1 54,72 A18,18 0,1,1 54,36 Z" />
-    <path
-        android:fillColor="#74F8E5"
-        android:pathData="M54,40 A14,14 0,1,0 54,68 A14,14 0,1,0 54,40 Z" />
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M29,22 H43 V28 H29 Z" />
+    <!-- Keep the complete camera inside the adaptive icon's central safe zone. -->
+    <group android:pivotX="54" android:pivotY="54"
+        android:scaleX="0.92" android:scaleY="0.92">
+        <path android:pathData="M36,35 H40 L43.2,29.6 C44,28.3 45.4,27.5 47,27.5 H61 C62.6,27.5 64,28.3 64.8,29.6 L68,35 H72 C78.6,35 84,40.4 84,47 V68 C84,74.6 78.6,80 72,80 H36 C29.4,80 24,74.6 24,68 V47 C24,40.4 29.4,35 36,35 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear" android:startX="40" android:startY="28"
+                    android:endX="68" android:endY="80"
+                    android:startColor="#FFFFFF" android:endColor="#DCEDE5" />
+            </aapt:attr>
+        </path>
+        <path android:pathData="M54,39.5 A17.5,17.5 0,1,1 54,74.5 A17.5,17.5 0,1,1 54,39.5 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear" android:startX="41" android:startY="42"
+                    android:endX="67" android:endY="72"
+                    android:startColor="#35665A" android:endColor="#102E29" />
+            </aapt:attr>
+        </path>
+        <path android:pathData="M54,42.2 A14.8,14.8 0,1,1 54,71.8 A14.8,14.8 0,1,1 54,42.2 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear" android:startX="44" android:startY="44"
+                    android:endX="65" android:endY="71"
+                    android:startColor="#BCF6D8" android:endColor="#56B89A" />
+            </aapt:attr>
+        </path>
+        <path android:pathData="M54,45.9 A11.1,11.1 0,1,1 54,68.1 A11.1,11.1 0,1,1 54,45.9 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear" android:startX="46" android:startY="47"
+                    android:endX="62" android:endY="67"
+                    android:startColor="#285B50" android:endColor="#0A2521" />
+            </aapt:attr>
+        </path>
+        <path android:fillColor="#D6FFEA" android:fillAlpha="0.85"
+            android:pathData="M50,49.8 A3.2,3.2 0,1,1 50,56.2 A3.2,3.2 0,1,1 50,49.8 Z" />
+        <path android:fillColor="#8AD9BD" android:fillAlpha="0.45"
+            android:pathData="M58.5,60.3 A1.4,1.4 0,1,1 58.5,63.1 A1.4,1.4 0,1,1 58.5,60.3 Z" />
+        <path android:fillColor="#A5C2B5"
+            android:pathData="M33,41 H39 A1.2,1.2 0,0,1 39,43.4 H33 A1.2,1.2 0,0,1 33,41 Z" />
+        <path android:fillColor="#D5A35F"
+            android:pathData="M75,41 A2,2 0,1,1 75,45 A2,2 0,1,1 75,41 Z" />
+    </group>
 </vector>

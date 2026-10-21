@@ -21,6 +21,7 @@ MainActivity / Compose navigation
 
 ## UI and navigation
 
+- Launcher artwork lives in `res/drawable/ic_launcher_*`: layered vector camera and gradient background, with a separate alpha-only monochrome mark for Android 13+ themed icons. Adaptive launcher resources retain the camera inside the central safe zone for different launcher masks. `docs/images/app-icon.png` is a rendered preview; Android uses the vector resources.
 - App-authored UI copy uses neutral terms such as “照片、内容、记录、处理” and must not explicitly mention “题目” or “解答”. This includes accessibility text, notifications, empty states, and errors. Model-generated/user content is preserved as content and is not subject to this wording rule.
 - `MainActivity.kt` owns the single-activity Compose host, page selection, system bar appearance, observable, paged task snapshots, and multi-window page behavior.
 - `CameraScreen.kt` owns camera permission, CameraX lifecycle, focus/zoom/flash, capture, and insertion of captured files into the task database.
