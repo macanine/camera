@@ -49,6 +49,8 @@ PRs and pushes to `main` call `.github/workflows/verify.yml`:
 
 Gradle wrapper has an official SHA-256 distribution checksum. Dependency locks and artifact checksum verification metadata are checked into the project; CI uses strict verification. When intentionally changing dependencies, regenerate both with `--write-locks --write-verification-metadata sha256`, review the changes, and include any host-specific build tools used by Linux CI.
 
+The current compatibility target is explicitly API 36. `OldTargetApi`'s online upgrade recommendation is excluded only for the app Gradle file; changing target SDK requires a deliberate compatibility migration. Other Lint warnings remain errors. Emulator jobs use a fixed Pixel 2 hardware profile. Explicitly dispatched release-branch verification posts a `Release CI` commit status so the automatic release PR shows its complete result without needing a personal token or approval of the duplicate automatic PR run.
+
 No signing secrets are passed to PR verification. The `smokeRelease` property supplies debug signing only to the optimized release verification APK when distribution credentials are absent; the tag workflow rebuilds with the distribution key and requires all four signing secrets before publishing. Debug packages use `.debug`; release device-test builds use `.smoke` so tests cannot overwrite an installed distribution build. The final distribution build uses neither suffix. Debug packages do not check for distribution updates.
 
 ## Publish a version

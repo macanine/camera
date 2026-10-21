@@ -13,3 +13,22 @@ concurrency:
 jobs:
   verify:
     uses: ./.github/workflows/verify.yml
+  report-release-check:
+    needs: verify
+    if: always() && github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      statuses: write
+    steps:
+      - name: Attach the complete verification result to the release PR commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT: ${{ github.sha }}
+          RESULT: ${{ needs.verify.result == 'success' && 'success' || 'failure' }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$COMMIT" \
+            -f "state=$RESULT" -f context='Release CI' \
+            -f 'description=Build, lint, JVM and API 26/36 device verification' \
+            -f "target_url=$RUN_URL" --silent
