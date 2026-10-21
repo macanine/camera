@@ -40,6 +40,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           BUMP: ${{ inputs.bump }}
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           printf '%s\n' "$NOTES" > "$RUNNER_TEMP/release-notes.md"
           TARGET="$(python3 scripts/release.py next --bump "$BUMP" \
             --notes "$RUNNER_TEMP/release-notes.md")"
@@ -53,6 +55,7 @@ jobs:
               echo "Release branch $BRANCH contains v$EXISTING, expected v$TARGET." >&2
               exit 1
             }
+            git merge --no-edit origin/main
           else
             git switch -c "$BRANCH"
           fi
@@ -75,8 +78,8 @@ jobs:
             echo "No version or note changes to commit."
           else
             git commit -m "Prepare v$TARGET"
-            git push "$REMOTE" "HEAD:$BRANCH"
           fi
+          git push "$REMOTE" "HEAD:$BRANCH"
           if [[ -z "$PR_NUMBER" ]]; then
             gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$BRANCH" \
               --title "Release v$TARGET" --body "Updates version.properties and RELEASE_NOTES.md. Merge this pull request, then create and push tag v$TARGET after CI passes."

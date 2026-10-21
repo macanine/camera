@@ -80,17 +80,21 @@ class UiFlowTest {
             var found = false
             InstrumentationRegistry.getInstrumentation().runOnMainSync {
                 fun visit(view: View) {
-                    if (view is TextView && view.text.startsWith(prefix) && view.text.length > 500) found = true
+                    if (view is TextView && view.isShown && view.width > 0 &&
+                        view.text.startsWith(prefix) && view.text.length > 500) found = true
                     if (view is ViewGroup) for (i in 0 until view.childCount) visit(view.getChildAt(i))
                 }
                 visit(ui.activity.window.decorView)
             }
             found
         }
+        ui.waitForIdle()
     }
 
     private fun screenshot(name: String) {
+        ui.waitForIdle()
         val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.waitForIdleSync()
         val output = InstrumentationRegistry.getArguments().getString("additionalTestOutputDir")
             ?: ui.activity.getExternalFilesDir(null)!!.absolutePath
         val folder = File(output, "ui-review").apply { mkdirs() }
