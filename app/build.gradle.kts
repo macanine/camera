@@ -56,6 +56,7 @@ android {
     buildTypes {
         debug { applicationIdSuffix = ".debug" }
         release {
+            if (testBuildType == "release") applicationIdSuffix = ".smoke"
             isMinifyEnabled = true
             isShrinkResources = true
             if (hasSigning) signingConfig = signingConfigs.getByName("distribution")
