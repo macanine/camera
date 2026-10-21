@@ -1,5 +1,7 @@
 # Camera · 相机
 
+<img src="docs/images/app-icon.png" alt="相机图标" width="96" height="96">
+
 [![CI](https://github.com/macanine/camera/actions/workflows/ci.yml/badge.svg)](https://github.com/macanine/camera/actions/workflows/ci.yml)
 [![Release](https://github.com/macanine/camera/actions/workflows/release.yml/badge.svg)](https://github.com/macanine/camera/actions/workflows/release.yml)
 
