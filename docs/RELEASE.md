@@ -49,7 +49,7 @@ PRs and pushes to `main` call `.github/workflows/verify.yml`:
 
 Gradle wrapper has an official SHA-256 distribution checksum. Dependency locks and artifact checksum verification metadata are checked into the project; CI uses strict verification. When intentionally changing dependencies, regenerate both with `--write-locks --write-verification-metadata sha256`, review the changes, and include any host-specific build tools used by Linux CI.
 
-No signing secrets are passed to PR verification. The `smokeRelease` property supplies debug signing only to the optimized release verification APK when distribution credentials are absent; the tag workflow rebuilds with the distribution key and requires all four signing secrets before publishing. Debug packages have a separate application ID and do not check for distribution updates.
+No signing secrets are passed to PR verification. The `smokeRelease` property supplies debug signing only to the optimized release verification APK when distribution credentials are absent; the tag workflow rebuilds with the distribution key and requires all four signing secrets before publishing. Debug packages use `.debug`; release device-test builds use `.smoke` so tests cannot overwrite an installed distribution build. The final distribution build uses neither suffix. Debug packages do not check for distribution updates.
 
 ## Publish a version
 
