@@ -67,6 +67,7 @@ class UiFlowTest {
         awaitRendered("NEW 内容：答案保持原样")
         ui.onNodeWithContentDescription("上一条记录").performClick()
         awaitRendered("OLD 内容：题目保持原样")
+        ui.onNodeWithContentDescription("复制完整内容").assertIsDisplayed().assertIsEnabled()
         screenshot("album-content")
         ui.onNodeWithContentDescription("更多操作").performClick()
         ui.onNodeWithText("删除记录").performClick()
@@ -95,6 +96,7 @@ class UiFlowTest {
         ui.waitForIdle()
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         instrumentation.waitForIdleSync()
+        instrumentation.uiAutomation.waitForIdle(250, 3_000)
         val output = InstrumentationRegistry.getArguments().getString("additionalTestOutputDir")
             ?: ui.activity.getExternalFilesDir(null)!!.absolutePath
         val folder = File(output, "ui-review").apply { mkdirs() }
