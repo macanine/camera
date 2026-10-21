@@ -4,6 +4,10 @@
     <issue id="AndroidGradlePluginVersion" severity="ignore" />
     <issue id="GradleDependency" severity="ignore" />
     <issue id="NewerVersionAvailable" severity="ignore" />
+    <!-- Target SDK is a deliberate compatibility policy, not a network-dependent upgrade gate. -->
+    <issue id="OldTargetApi">
+        <ignore path="build.gradle.kts" />
+    </issue>
     <!-- Adaptive icons require an API-qualified directory even when minSdk is 26. -->
     <issue id="ObsoleteSdkInt">
         <ignore path="src/main/res/mipmap-anydpi-v26" />
