@@ -21,3 +21,6 @@
 -keep class com.photoanswer.app.SecurePrefs { *; }
 -keep class com.photoanswer.app.SolveTask { *; }
 -keep class com.photoanswer.app.MathMarkdown { *; }
+# FormulaReleaseTest calls the renderer and inspects its drawables from the test DEX.
+-keep class io.noties.markwon.Markwon** { *; }
+-keep class io.noties.markwon.image.AsyncDrawable** { *; }

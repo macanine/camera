@@ -4596,5 +4596,10 @@
             <sha256 value="1239e9dbe1397cd5971342956b2511bc3ace7b641842e4372a088dcfa8b9ad55" origin="Maven Central HTTPS; published checksum verified"/>
          </artifact>
       </component>
+      <component group="com.google.guava" name="guava-parent" version="33.4.8-jre">
+         <artifact name="guava-parent-33.4.8-jre.pom">
+            <sha256 value="a03c5199a1be14443df7fd40ba8673b1c6aae04deef6688ce7d573ea489e3a20" origin="Maven Central HTTPS; published checksum verified"/>
+         </artifact>
+      </component>
    </components>
 </verification-metadata>
