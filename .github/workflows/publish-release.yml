@@ -1,0 +1,41 @@
+name: Publish current version
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: publish-current-version
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Tag the reviewed main revision and start release verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="$(python3 scripts/release.py current)"
+          TAG="v$VERSION"
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq '.[] | select(.draft == false) | .tag_name' > "$RUNNER_TEMP/published-tags"
+          python3 scripts/release.py validate --tag "$TAG" --existing-tags "$RUNNER_TEMP/published-tags"
+          if git show-ref --verify --quiet "refs/tags/$TAG"; then
+            test "$(git rev-list -n 1 "$TAG")" = "$(git rev-parse HEAD)"
+          else
+            git tag "$TAG"
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/$TAG"
+          fi
+          # GITHUB_TOKEN tag pushes do not trigger push workflows; dispatch explicitly.
+          gh workflow run release.yml --repo "$GITHUB_REPOSITORY" --ref "$TAG" -f "tag=$TAG"
+          echo "Release verification requested for $TAG at $(git rev-parse HEAD)." >> "$GITHUB_STEP_SUMMARY"

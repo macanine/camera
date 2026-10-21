@@ -1,0 +1,87 @@
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version increment
+        type: choice
+        required: true
+        options: [patch, minor, major, rc]
+        default: patch
+      notes:
+        description: User-facing notes; neutral wording only
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Resolve release branch
+        id: release
+        env:
+          NOTES: ${{ inputs.notes }}
+          GH_TOKEN: ${{ github.token }}
+          BUMP: ${{ inputs.bump }}
+        run: |
+          printf '%s\n' "$NOTES" > "$RUNNER_TEMP/release-notes.md"
+          TARGET="$(python3 scripts/release.py next --bump "$BUMP" \
+            --notes "$RUNNER_TEMP/release-notes.md")"
+          BRANCH="release/v$TARGET"
+          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null; then
+            git fetch "$REMOTE" "refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+            git switch -C "$BRANCH" "refs/remotes/origin/$BRANCH"
+            EXISTING="$(python3 scripts/release.py current)"
+            test "$EXISTING" = "$TARGET" || {
+              echo "Release branch $BRANCH contains v$EXISTING, expected v$TARGET." >&2
+              exit 1
+            }
+          else
+            git switch -c "$BRANCH"
+          fi
+          python3 scripts/release.py prepare --version "$TARGET" --notes "$RUNNER_TEMP/release-notes.md"
+          echo "version=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+      - name: Open release pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ steps.release.outputs.version }}
+          BRANCH: ${{ steps.release.outputs.branch }}
+        run: |
+          PR_NUMBER="$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" \
+            --state open --json number --jq '.[0].number // empty')"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git add version.properties RELEASE_NOTES.md
+          if git diff --cached --quiet; then
+            echo "No version or note changes to commit."
+          else
+            git commit -m "Prepare v$TARGET"
+            git push "$REMOTE" "HEAD:$BRANCH"
+          fi
+          if [[ -z "$PR_NUMBER" ]]; then
+            gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$BRANCH" \
+              --title "Release v$TARGET" --body "Updates version.properties and RELEASE_NOTES.md. Merge this pull request, then create and push tag v$TARGET after CI passes."
+          else
+            echo "Updated the existing release pull request #$PR_NUMBER."
+          fi
+          # Explicit dispatch runs CI on this branch without a personal token.
+          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
