@@ -56,8 +56,7 @@ import kotlin.math.roundToInt
 private val photoSaveScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
 @Composable
-internal fun CameraScreen(tasks: List<SolveTask> = emptyList(), activeCount: Int = tasks.count { it.status in setOf("RUNNING", "SWITCHING", "VERIFYING") },
-    queuedCount: Int = tasks.count { it.status == "QUEUED" }, onAlbum: () -> Unit, onSettings: () -> Unit) {
+internal fun CameraScreen(activeCount: Int = 0, queuedCount: Int = 0, onAlbum: () -> Unit, onSettings: () -> Unit) {
     val snackbar = remember { SnackbarHostState() }
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
@@ -278,7 +277,10 @@ internal fun CameraScreen(tasks: List<SolveTask> = emptyList(), activeCount: Int
                     }
                 }.pointerInput(cameraReady, maxZoom, controller) {
                     detectTransformGestures { _, _, zoom, _ ->
-                        if (cameraReady) controller.setZoomRatio((zoomRatio * zoom).coerceIn(1f, maxZoom))
+                        if (cameraReady) {
+                            val current = controller.zoomState.value?.zoomRatio ?: zoomRatio
+                            controller.setZoomRatio((current * zoom).coerceIn(1f, maxZoom))
+                        }
                     }
                 })
             focusPoint?.let { point ->

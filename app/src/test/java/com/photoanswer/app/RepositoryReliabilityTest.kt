@@ -16,7 +16,7 @@ import org.robolectric.annotation.Config
 class RepositoryReliabilityTest {
     @Before fun cleanHistory() {
         TaskStore.init(RuntimeEnvironment.getApplication())
-        TaskStore.db.all().forEach { TaskStore.db.delete(it.id) }
+        TaskStore.db.history(100_000).forEach { TaskStore.db.delete(it.id) }
     }
     @Test fun `foreground wake starts queued work without restarting interrupted requests`() = runBlocking {
         val context = RuntimeEnvironment.getApplication()

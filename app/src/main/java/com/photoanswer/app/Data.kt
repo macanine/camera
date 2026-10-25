@@ -70,9 +70,6 @@ class TaskDatabase(context: Context) : SQLiteOpenHelper(context, "photoanswer.db
             arrayOf<Any>(task.id, task.createdAt, task.imagePath, task.status))
         changed()
     }
-    @Synchronized fun all(): List<SolveTask> = readableDatabase.rawQuery("SELECT * FROM tasks ORDER BY createdAt DESC", null).use { c ->
-        buildList { while (c.moveToNext()) add(c.toTask()) }
-    }
     @Synchronized fun get(id: String): SolveTask? = readableDatabase.rawQuery("SELECT * FROM tasks WHERE id=?", arrayOf(id)).use { c ->
         if (c.moveToFirst()) c.toTask() else null
     }
@@ -124,17 +121,31 @@ class TaskDatabase(context: Context) : SQLiteOpenHelper(context, "photoanswer.db
         val current = get(id) ?: return false
         if (expectedGeneration != null && current.generation != expectedGeneration) return false
         if (activeOnly && current.status !in setOf("RUNNING", "SWITCHING", "VERIFYING")) return false
-        val next = current.copy(status = status, answer = answer ?: current.answer, provider = provider ?: current.provider,
-            model = model ?: current.model, error = error ?: current.error, attempts = attempts ?: current.attempts,
-            generation = generation ?: current.generation, draft = draft ?: current.draft, progress = progress ?: current.progress,
-            verification = verification ?: current.verification, solutionJson = solutionJson ?: current.solutionJson, suggestion = suggestion ?: current.suggestion)
-        if (next == current) return true
-        writableDatabase.execSQL("""UPDATE tasks SET status=?,answer=?,provider=?,model=?,error=?,attempts=?,
-            generation=?,draft=?,progress=?,verification=?,solutionJson=?,suggestion=? WHERE id=?""",
-            arrayOf<Any>(status, answer ?: current.answer, provider ?: current.provider, model ?: current.model,
-                error ?: current.error, attempts ?: current.attempts, generation ?: current.generation,
-                draft ?: current.draft, progress ?: current.progress, verification ?: current.verification,
-                solutionJson ?: current.solutionJson, suggestion ?: current.suggestion, id))
+        val columns = mutableListOf("status")
+        val values = mutableListOf<Any>(status)
+        fun changed(column: String, next: Any?, old: Any) {
+            if (next != null && next != old) {
+                columns += column
+                values += next
+            }
+        }
+        changed("answer", answer, current.answer)
+        changed("provider", provider, current.provider)
+        changed("model", model, current.model)
+        changed("error", error, current.error)
+        changed("attempts", attempts, current.attempts)
+        changed("generation", generation, current.generation)
+        changed("draft", draft, current.draft)
+        changed("progress", progress, current.progress)
+        changed("verification", verification, current.verification)
+        changed("solutionJson", solutionJson, current.solutionJson)
+        changed("suggestion", suggestion, current.suggestion)
+        if (columns.size == 1 && status == current.status) return true
+        values += id
+        writableDatabase.execSQL(
+            "UPDATE tasks SET ${columns.joinToString(",") { "$it=?" }} WHERE id=?",
+            values.toTypedArray()
+        )
         changed()
         return true
     }

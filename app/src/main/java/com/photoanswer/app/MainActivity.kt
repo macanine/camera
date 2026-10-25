@@ -159,7 +159,6 @@ private fun PhotoAnswerApp() {
         ) { current ->
             when (current) {
                 Page.CAMERA -> CameraScreen(
-                    tasks = tasks,
                     activeCount = snapshot.active,
                     queuedCount = snapshot.queued,
                     onAlbum = {

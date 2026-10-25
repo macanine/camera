@@ -61,7 +61,7 @@ internal fun AppUpdateHost() {
         onDismissRequest = { AppUpdates.dismiss() },
         title = { Text("新版本 ${release.versionName}") },
         text = { Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (release.notes.isNotBlank()) Text(neutralUiCopy(release.notes))
+            if (release.notes.isNotBlank()) Text(release.notes)
             Text(installError.ifBlank { state.message })
             if (state.downloading) { LinearProgressIndicator(progress = { state.progress / 100f }, modifier = Modifier.fillMaxWidth()); Text("${state.progress}%") }
         } },

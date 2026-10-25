@@ -90,7 +90,7 @@ internal fun AlbumScreen(tasks: List<SolveTask>, selectedId: String, onSelect: (
                             menuOpen = false
                             if (id != null) scope.launch {
                                 details = try {
-                                    withContext(Dispatchers.IO) { neutralUiCopy(TaskStore.db.attemptDetails(id)).ifBlank { "尚无调用记录" } }
+                                    withContext(Dispatchers.IO) { TaskStore.db.attemptDetails(id).ifBlank { "尚无调用记录" } }
                                 } catch (e: kotlinx.coroutines.CancellationException) { throw e }
                                 catch (e: Exception) { "调用记录暂时无法读取，诊断编号 ${LocalDiagnostics.record("attempt-details", e)}" }
                             }

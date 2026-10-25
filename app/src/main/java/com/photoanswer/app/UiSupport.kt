@@ -42,8 +42,14 @@ internal fun historyBucket(epoch: Long, nowMillis: Long = System.currentTimeMill
     }
 }
 
-internal fun neutralUiCopy(text: String): String = text.replace("解题", "处理").replace("答案", "内容")
-    .replace("解答", "内容").replace("题目", "条目").replace("原题", "原图").replace("题号", "编号")
+/** Keep app-authored diagnostics neutral without rewriting provider/model-generated content. */
+internal fun neutralUiCopy(text: String): String = text
+    .replace("解题", "处理")
+    .replace("解答", "内容")
+    .replace("题目", "条目")
+    .replace("原题", "原图")
+    .replace("题号", "编号")
+    .replace("答案", "内容")
 
 internal fun friendlyError(raw: String, status: String): String {
     val text = neutralUiCopy(raw.trim())

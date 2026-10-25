@@ -29,7 +29,7 @@ class UiFlowTest {
         val context = ui.activity.applicationContext
         context.getSharedPreferences("updates", 0).edit().putBoolean("automatic", false).commit()
         SecurePrefs.save(context, emptyList())
-        TaskStore.db.all().forEach { TaskStore.db.delete(it.id) }
+        TaskStore.db.history(100_000).forEach { TaskStore.db.delete(it.id) }
     }
 
     @Test fun connectionDraftSurvivesRotationAndRequiresExplicitDiscard() {

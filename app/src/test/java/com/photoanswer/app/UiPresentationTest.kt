@@ -34,4 +34,7 @@ class UiPresentationTest {
         assertEquals("本月", historyBucket(date(2026, 10, 4), now))
         assertEquals("9月", historyBucket(date(2026, 9, 4), now))
     }
+    @Test fun `app-authored diagnostics remain neutral`() {
+        assertEquals("处理条目失败，请查看内容", neutralUiCopy("解题题目失败，请查看答案"))
+    }
 }
